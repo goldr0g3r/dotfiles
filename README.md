@@ -1,6 +1,9 @@
 # DotFiles
 
-## Install git
+# Install Dependencies
+### Install git
 `
 pacman -S git
 `
+
+
