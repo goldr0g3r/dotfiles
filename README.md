@@ -15,7 +15,7 @@ Install Stow and git
 ## Steps to setup
  - `mv dotfiles .dotfiles`
  - `cd .dotfiles`
- - 'stow .'
+ - `stow .`
 
 
 
