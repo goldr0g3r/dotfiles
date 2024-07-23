@@ -87,3 +87,7 @@ eval "$(zoxide init --cmd cd zsh)"
 
 # fzf-git( git support for fzf )
 source ~/.config/fzf/fzf-git.sh
+
+# Add in Conda (ML)
+eval "$(/home/anandhu/.anaconda3/bin/conda shell.zsh hook)"
+
