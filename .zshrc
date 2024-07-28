@@ -85,9 +85,9 @@ alias zshenvconfig='nvim ~/.zshenv'
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-# fzf-git( git support for fzf )
+# ffzf-git( git support for fzf )
 source ~/.config/fzf/fzf-git.sh
 
-# Add in Conda (ML)
-eval "$(/home/anandhu/.anaconda3/bin/conda shell.zsh hook)"
-
+# Add in NVM ( node version management )
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
