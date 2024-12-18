@@ -1,7 +1,3 @@
-import = [
-	"~/.config/alacritty/themes/coolnight.toml"
-]
-live_config_reload=true
 [env]
 TERM="xterm-256color"
 [window]
@@ -10,4 +6,10 @@ blur=true
 
 [font]
 normal.family = "SauceCodePro Nerd Font"
+
+[general]
+live_config_reload=true
+import = [
+	"~/.config/alacritty/themes/coolnight.toml"
+]
 
