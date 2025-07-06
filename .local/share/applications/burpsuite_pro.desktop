@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Burp Suite Professional
+Comment=Web application security testing software
+Exec=burpsuitepro
+Icon=/opt/Burpsuite-Professional/burp_suite.ico
+Terminal=false
+Type=Application
+Categories=Application;Security;Development;
