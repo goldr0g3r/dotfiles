@@ -1,0 +1,7 @@
+.git
+^/README.*
+^/LICENSE.*
+^/COPYING
+
+.icons
+.themes
