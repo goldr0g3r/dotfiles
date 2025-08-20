@@ -2,7 +2,7 @@
 export PATH="$HOME/.local/bin:$PATH"
 
 # Flutter
-export PATH="/opt/flutter/bin:$PATH"
+export PATH="$HOME/.local/share/flutter/bin/:$PATH"
 
 # Chrome Path
 export CHROME_EXECUTABLE="/usr/bin/brave"
