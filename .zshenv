@@ -16,3 +16,4 @@ export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 
+export PATH=$PATH:"$HOME/.cargo/env"
