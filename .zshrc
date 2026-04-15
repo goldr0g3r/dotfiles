@@ -70,6 +70,42 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
+# Updating hosts file
+update-hosts() {
+    echo "🌐 Fetching latest adult blocklist from GitHub..."
+    curl -s "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn-only/hosts" > /tmp/dl_hosts
+    
+    echo "🛠️ Prepending native Fedora loopback entries..."
+    # Create a temporary file and write your exact header into it
+    cat << 'EOF' > /tmp/custom_hosts
+# Loopback entries; do not change.
+# For historical reasons, localhost precedes localhost.localdomain:
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+# See hosts(5) for proper format and other examples:
+# 192.168.1.10 foo.example.org foo
+# 192.168.1.13 bar.example.org bar
+
+# --- END NATIVE LOOPBACK / BEGIN FILTER LIST ---
+
+EOF
+
+    # Append the downloaded blocklist directly beneath your header
+    cat /tmp/dl_hosts >> /tmp/custom_hosts
+    
+    echo "🔒 Applying new configuration to /etc/hosts (Sudo required)..."
+    sudo mv /tmp/custom_hosts /etc/hosts
+    sudo chown root:root /etc/hosts
+    sudo chmod 644 /etc/hosts
+    
+    echo "🧹 Flushing system DNS cache..."
+    resolvectl flush-caches
+    
+    # Cleanup
+    rm -f /tmp/dl_hosts
+    echo "✅ Hosts file successfully updated and secured!"
+}
+
 # ---- Eza (better ls) -----
 alias ls="eza --icons=always"
 alias ll="eza -la --icons=always"
