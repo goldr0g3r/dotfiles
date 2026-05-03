@@ -22,7 +22,6 @@ source "${ZINIT_HOME}/zinit.zsh"
 # Add in Powerlevel10k
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-
 # Add in zsh plugins
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
@@ -40,17 +39,13 @@ autoload -Uz compinit && compinit
 
 zinit cdreplay -q
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 # Keybindings
-# ^[[1;5A^[[1;5B
 bindkey -e
 bindkey '^[[1;5A' history-search-backward # ctrl + up 
-bindkey '^[[1;5B' history-search-forward # ctrl + down
+bindkey '^[[1;5B' history-search-forward  # ctrl + down
 bindkey '^[w' kill-region
 
-# History
+# History Configuration
 HISTSIZE=10000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
@@ -63,34 +58,34 @@ setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-# Completion styling
+# ---- FZF Core Engine Configuration (Optimized with fd) ----
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --exclude .git --exclude node_modules"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --exclude .git --exclude node_modules"
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --inline-info"
+
+# ---- Completion & fzf-tab styling (Optimized with eza) ----
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
 
-# Updating hosts file
+# Updating hosts file (DNS Blocklist)
 update-hosts() {
     echo "🌐 Fetching latest adult blocklist from GitHub..."
     curl -s "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn-only/hosts" > /tmp/dl_hosts
     
-    echo "🛠️ Prepending native Fedora loopback entries..."
-    # Create a temporary file and write your exact header into it
+    echo "🛠️ Prepending native loopback entries..."
     cat << 'EOF' > /tmp/custom_hosts
 # Loopback entries; do not change.
-# For historical reasons, localhost precedes localhost.localdomain:
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-# See hosts(5) for proper format and other examples:
-# 192.168.1.10 foo.example.org foo
-# 192.168.1.13 bar.example.org bar
 
 # --- END NATIVE LOOPBACK / BEGIN FILTER LIST ---
 
 EOF
 
-    # Append the downloaded blocklist directly beneath your header
     cat /tmp/dl_hosts >> /tmp/custom_hosts
     
     echo "🔒 Applying new configuration to /etc/hosts (Sudo required)..."
@@ -99,43 +94,45 @@ EOF
     sudo chmod 644 /etc/hosts
     
     echo "🧹 Flushing system DNS cache..."
-    resolvectl flush-caches
+    sudo resolvectl flush-caches
     
-    # Cleanup
     rm -f /tmp/dl_hosts
     echo "✅ Hosts file successfully updated and secured!"
 }
 
-# ---- Eza (better ls) -----
+# Aliases
 alias ls="eza --icons=always"
 alias ll="eza -la --icons=always"
-
-# ---- Bat (better cat) ----
 alias ocat="/usr/bin/cat"
 alias cat="bat"
-
-# Aliases
 alias vim='nvim'
 alias clr='clear'
 alias zshconfig='nvim ~/.zshrc'
 alias zshenvconfig='nvim ~/.zshenv'
+alias apt="nala"
+alias sudo="sudo "
 
-# Shell integrations
+# Shell Integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+[ -f ~/.config/fzf/fzf-git.sh ] && source ~/.config/fzf/fzf-git.sh
 
-# ffzf-git( git support for fzf )
-source ~/.config/fzf/fzf-git.sh
+# ---- FNM (Fast Node Manager) ----
+FNM_PATH="$HOME/.local/share/fnm"
 
-# Add in NVM ( node version management )
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Auto-install fnm if the executable is missing
+if [ ! -f "$FNM_PATH/fnm" ]; then
+  echo "⚡ Fast Node Manager (fnm) not found. Initializing automated installation..."
+  # Download and install silently, skipping automatic shell modifications
+  curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$FNM_PATH" --skip-shell
+  echo "✅ fnm installed successfully."
+fi
 
-# Add in PyEnv (Python version management)
-#export PYENV_ROOT="$HOME/.pyenv"
-#[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-#eval "$(pyenv init - zsh)"
+# Initialize fnm into the current session
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "$(fnm env --shell zsh --use-on-cd)"
+fi
 
-# Using nala (apt++ package manager)
-alias apt="sudo nala"
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
