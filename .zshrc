@@ -104,7 +104,16 @@ EOF
 alias ls="eza --icons=always"
 alias ll="eza -la --icons=always"
 alias ocat="/usr/bin/cat"
-alias cat="bat"
+
+# In arch linux it is bat but in debian it is batcat
+if (( $+commands[batcat] )); then
+    alias cat='/usr/bin/batcat --paging=never'
+  elif (( $+commands[bat] )); then
+    alias cat="/usr/bin/bat"
+  else
+    alias cat='cat'
+fi
+
 alias vim='nvim'
 alias clr='clear'
 alias zshconfig='nvim ~/.zshrc'
